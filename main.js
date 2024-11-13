@@ -9,8 +9,11 @@ const renderer = new THREE.WebGLRenderer({antialias: true});
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load('/courtyard_1k.hdr', function (texture){
     texture.mapping = THREE.EquirectangularReflectionMapping;
+
     //scene.background = texture; // Render HDR as Backgroundimage 
-    //scene.environment = texture; // Renders Reflection(EnvMap) for ALL Objects & lights the Scene
+    scene.environment = texture; // Renders Reflection(EnvMap) for ALL Objects & lights the Scene
+    // Rotate the environment map by 150 degrees around the Y-axis
+    scene.environmentRotation = new THREE.Euler(0, THREE.MathUtils.degToRad(150), 0);
 
     const sphere = new THREE.Mesh(
         new THREE.SphereGeometry (1, 50, 50),
@@ -30,7 +33,6 @@ rgbeLoader.load('/courtyard_1k.hdr', function (texture){
             roughness: 0,
             metalness: 0.5,
             color: 0x00FF00,
-            envMap: texture, // Assign envMap to only THIS Object
         })
     );
     scene.add(sphere2);
@@ -40,8 +42,12 @@ rgbeLoader.load('/courtyard_1k.hdr', function (texture){
 
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.8;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMappingExposure = 1.8;
+
+// Schatten
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.shadowMap; // einfach zu berechnende ShadowMap
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
