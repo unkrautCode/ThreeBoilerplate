@@ -1,12 +1,53 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
+
+
+
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/courtyard_1k.hdr', function (texture){
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    //scene.background = texture; // Render HDR as Backgroundimage 
+    //scene.environment = texture; // Renders Reflection(EnvMap) for ALL Objects & lights the Scene
+
+    const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry (1, 50, 50),
+        new THREE.MeshStandardMaterial({
+            roughness: 0,
+            metalness: 0.5,
+            color: 0xFFEA00
+        })
+    );
+    scene.add(sphere);
+    sphere.position.x = 1.5;
+
+    // Sphere 2
+    const sphere2 = new THREE.Mesh(
+        new THREE.SphereGeometry (1, 50, 50),
+        new THREE.MeshStandardMaterial({
+            roughness: 0,
+            metalness: 0.5,
+            color: 0x00FF00,
+            envMap: texture, // Assign envMap to only THIS Object
+        })
+    );
+    scene.add(sphere2);
+    sphere2.position.x = -1.5;
+
+});
+
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.8;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Sets the color of the background.
-renderer.setClearColor(0xFEFEFE);
+//renderer.setClearColor(0xFEFEFE);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
